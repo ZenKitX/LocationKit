@@ -355,7 +355,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                 ],
               ),
               const SizedBox(height: 12),
-              _buildDetailRow('Name', location.name ?? 'Unknown'),
+              _buildDetailRow('Name', location.name),
               if (location.city != null) _buildDetailRow('City', location.city!),
               if (location.region != null) _buildDetailRow('Region', location.region!),
               _buildDetailRow('Country', location.country ?? 'Unknown'),
