@@ -16,9 +16,6 @@ class LocationError {
     required this.message,
   });
 
-  final LocationErrorType type;
-  final String message;
-
   /// Create permission denied error
   factory LocationError.permissionDenied(String message) {
     return LocationError(type: LocationErrorType.permissionDenied, message: message);
@@ -39,6 +36,9 @@ class LocationError {
     return LocationError(type: LocationErrorType.unknown, message: message);
   }
 
+  final LocationErrorType type;
+  final String message;
+
   @override
   String toString() => 'LocationError: $type - $message';
 }
@@ -50,10 +50,6 @@ class LocationResult<T> {
     required this.error,
     required this.isSuccess,
   });
-
-  final T? data;
-  final LocationError? error;
-  final bool isSuccess;
 
   /// Create a success result
   factory LocationResult.success(T data) {
@@ -73,6 +69,10 @@ class LocationResult<T> {
     );
   }
 
+  final T? data;
+  final LocationError? error;
+  final bool isSuccess;
+
   R fold<R>(
     R Function(T data) onSuccess,
     R Function(LocationError error) onFailure,
@@ -89,6 +89,8 @@ class LocationResult<T> {
 /// Note: This is a mock implementation. In a real app, you would use
 /// the `location` package (https://pub.dev/packages/location)
 class LocationService {
+  LocationService();
+
   /// Get current location
   ///
   /// Note: This is a mock implementation that returns Beijing coordinates

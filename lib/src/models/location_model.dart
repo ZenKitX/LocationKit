@@ -7,9 +7,6 @@ class LatLong {
     required this.longitude,
   });
 
-  final double latitude;
-  final double longitude;
-
   /// Create from JSON
   factory LatLong.fromJson(Map<String, dynamic> json) {
     return LatLong(
@@ -17,6 +14,9 @@ class LatLong {
       longitude: (json['longitude'] ?? 0).toDouble(),
     );
   }
+
+  final double latitude;
+  final double longitude;
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
@@ -67,6 +67,21 @@ class LocationData {
     this.timestamp,
   });
 
+  /// Create from JSON
+  factory LocationData.fromJson(Map<String, dynamic> json) {
+    return LocationData(
+      latitude: json['latitude']?.toDouble(),
+      longitude: json['longitude']?.toDouble(),
+      city: json['city'],
+      region: json['region'],
+      country: json['country'],
+      address: json['address'],
+      timestamp: json['timestamp'] != null
+          ? DateTime.parse(json['timestamp'])
+          : null,
+    );
+  }
+
   /// Latitude
   final double? latitude;
 
@@ -87,21 +102,6 @@ class LocationData {
 
   /// Timestamp
   final DateTime? timestamp;
-
-  /// Create from JSON
-  factory LocationData.fromJson(Map<String, dynamic> json) {
-    return LocationData(
-      latitude: json['latitude']?.toDouble(),
-      longitude: json['longitude']?.toDouble(),
-      city: json['city'],
-      region: json['region'],
-      country: json['country'],
-      address: json['address'],
-      timestamp: json['timestamp'] != null
-          ? DateTime.parse(json['timestamp'])
-          : null,
-    );
-  }
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {

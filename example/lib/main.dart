@@ -31,7 +31,7 @@ class LocationExamplePage extends StatefulWidget {
 class _LocationExamplePageState extends State<LocationExamplePage> {
   final LocationService _locationService = LocationService();
   LocationResult<LocationData>? _currentLocation;
-  LocationResult<LocationData>? _reverseGeocodeResult;
+  LocationResult<String>? _reverseGeocodeResult;
   double? _distance;
   bool _isLoading = false;
 
@@ -177,8 +177,9 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      final hasPermission = await _locationService.hasPermission();
+                      final result = await _locationService.hasPermission();
                       if (mounted) {
+                        final hasPermission = result.isSuccess && result.data == true;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -194,8 +195,9 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      final granted = await _locationService.requestPermission();
+                      final result = await _locationService.requestPermission();
                       if (mounted) {
+                        final granted = result.isSuccess && result.data == true;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -272,7 +274,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
   Widget _buildLocationResult(LocationResult<LocationData> result) {
     return result.fold(
       (location) => Card(
-        color: Colors.green[50],
+        color: Colors.green.shade50,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -285,7 +287,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   Text(
                     'Location Found',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.green[700],
+                          color: Colors.green.shade700,
                         ),
                   ),
                 ],
@@ -307,7 +309,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
         ),
       ),
       (error) => Card(
-        color: Colors.red[50],
+        color: Colors.red.shade50,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(

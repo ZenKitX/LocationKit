@@ -100,7 +100,6 @@ void benchmarkDistanceCalculation() {
 void benchmarkLocationDataCreation() {
   print('--- LocationData Creation Benchmark ---');
 
-  const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
   const iterations = 10000;
 
   // Benchmark minimal location data
@@ -147,7 +146,6 @@ void benchmarkLocationDataCreation() {
 void benchmarkResultCreation() {
   print('--- Result Creation Benchmark ---');
 
-  const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
   final location = LocationData(
     city: 'Beijing',
     latitude: 39.9042,
