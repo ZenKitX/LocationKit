@@ -178,10 +178,11 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   ElevatedButton.icon(
                     onPressed: () async {
                       final context = this.context;
+                      final messenger = ScaffoldMessenger.of(context);
                       final result = await _locationService.hasPermission();
                       if (!mounted) return;
                       final hasPermission = result.isSuccess && result.data == true;
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         SnackBar(
                           content: Text(
                             hasPermission ? 'Permission Granted' : 'Permission Denied',
@@ -196,10 +197,11 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   ElevatedButton.icon(
                     onPressed: () async {
                       final context = this.context;
+                      final messenger = ScaffoldMessenger.of(context);
                       final result = await _locationService.requestPermission();
                       if (!mounted) return;
                       final granted = result.isSuccess && result.data == true;
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         SnackBar(
                           content: Text(
                             granted ? 'Permission Granted' : 'Permission Denied',
@@ -247,7 +249,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
 
   Widget _buildCoordinatesInput(LatLong coordinates, String label) {
     return Card(
-      color: Colors.grey[50],
+      color: Colors.grey.shade50,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -412,7 +414,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
             child: Text(
               '$label:',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: Colors.grey.shade600,
                   ),
             ),
           ),
