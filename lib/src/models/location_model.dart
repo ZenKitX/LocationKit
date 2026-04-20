@@ -1,7 +1,72 @@
 import 'dart:math';
 
+/// Latitude and longitude pair
+class LatLong {
+  LatLong({
+    required this.latitude,
+    required this.longitude,
+  });
+
+  final double latitude;
+  final double longitude;
+
+  /// Create from JSON
+  factory LatLong.fromJson(Map<String, dynamic> json) {
+    return LatLong(
+      latitude: (json['latitude'] ?? 0).toDouble(),
+      longitude: (json['longitude'] ?? 0).toDouble(),
+    );
+  }
+
+  /// Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+  }
+
+  /// Check if coordinates are valid
+  bool get isValid => latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+
+  /// Calculate distance between two points in kilometers
+  double distanceTo(LatLong other) {
+    const earthRadiusKm = 6371.0;
+
+    final dLat = _degreesToRadians(other.latitude - latitude);
+    final dLon = _degreesToRadians(other.longitude - longitude);
+
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degreesToRadians(latitude)) *
+        cos(_degreesToRadians(other.latitude)) *
+        sin(dLon / 2) *
+        sin(dLon / 2);
+
+    final c = 2 * asin(sqrt(a));
+
+    return earthRadiusKm * c;
+  }
+
+  double _degreesToRadians(double degrees) {
+    return degrees * (pi / 180.0);
+  }
+
+  @override
+  String toString() => 'LatLong(lat: $latitude, lon: $longitude)';
+}
+
 /// Location data model
 class LocationData {
+  LocationData({
+    this.latitude,
+    this.longitude,
+    this.city,
+    this.region,
+    this.country,
+    this.address,
+    this.timestamp,
+  });
+
   /// Latitude
   final double? latitude;
 
@@ -22,16 +87,6 @@ class LocationData {
 
   /// Timestamp
   final DateTime? timestamp;
-
-  LocationData({
-    this.latitude,
-    this.longitude,
-    this.city,
-    this.region,
-    this.country,
-    this.address,
-    this.timestamp,
-  });
 
   /// Create from JSON
   factory LocationData.fromJson(Map<String, dynamic> json) {
@@ -78,6 +133,25 @@ class LocationData {
     return 'Unknown location';
   }
 
+  /// Get coordinates as LatLong
+  LatLong? get coordinates {
+    if (hasCoordinates) {
+      return LatLong(latitude: latitude!, longitude: longitude!);
+    }
+    return null;
+  }
+
+  /// Get location name
+  String get name {
+    if (city != null) {
+      return city!;
+    }
+    if (country != null) {
+      return country!;
+    }
+    return 'Unknown';
+  }
+
   @override
   String toString() {
     return 'LocationData(lat: $latitude, lon: $longitude, city: $city)';
@@ -95,40 +169,4 @@ class LocationData {
 
   @override
   int get hashCode => Object.hash(latitude, longitude, city, country);
-}
-
-/// Latitude and longitude pair
-class LatLong {
-  final double latitude;
-  final double longitude;
-
-  LatLong({
-    required this.latitude,
-    required this.longitude,
-  });
-
-  /// Calculate distance between two points in kilometers
-  double distanceTo(LatLong other) {
-    const double earthRadiusKm = 6371.0;
-
-    final double dLat = _degreesToRadians(other.latitude - latitude);
-    final double dLon = _degreesToRadians(other.longitude - longitude);
-
-    final double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_degreesToRadians(latitude)) *
-        cos(_degreesToRadians(other.latitude)) *
-        sin(dLon / 2) *
-        sin(dLon / 2);
-
-    final double c = 2 * asin(sqrt(a));
-
-    return earthRadiusKm * c;
-  }
-
-  double _degreesToRadians(double degrees) {
-    return degrees * (pi / 180.0);
-  }
-
-  @override
-  String toString() => 'LatLong(lat: $latitude, lon: $longitude)';
 }

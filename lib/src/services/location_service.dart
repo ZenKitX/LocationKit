@@ -11,13 +11,33 @@ enum LocationErrorType {
 
 /// Location error
 class LocationError {
-  final LocationErrorType type;
-  final String message;
-
   LocationError({
     required this.type,
     required this.message,
   });
+
+  final LocationErrorType type;
+  final String message;
+
+  /// Create permission denied error
+  factory LocationError.permissionDenied(String message) {
+    return LocationError(type: LocationErrorType.permissionDenied, message: message);
+  }
+
+  /// Create service disabled error
+  factory LocationError.serviceDisabled(String message) {
+    return LocationError(type: LocationErrorType.serviceDisabled, message: message);
+  }
+
+  /// Create timeout error
+  factory LocationError.timeout(String message) {
+    return LocationError(type: LocationErrorType.timeout, message: message);
+  }
+
+  /// Create unknown error
+  factory LocationError.unknown(String message) {
+    return LocationError(type: LocationErrorType.unknown, message: message);
+  }
 
   @override
   String toString() => 'LocationError: $type - $message';
@@ -25,22 +45,32 @@ class LocationError {
 
 /// Result type for location operations
 class LocationResult<T> {
+  LocationResult._({
+    required this.data,
+    required this.error,
+    required this.isSuccess,
+  });
+
   final T? data;
   final LocationError? error;
   final bool isSuccess;
 
-  LocationResult._({
-    this.data,
-    this.error,
-    required this.isSuccess,
-  });
-
+  /// Create a success result
   factory LocationResult.success(T data) {
-    return LocationResult._(data: data, isSuccess: true);
+    return LocationResult._(
+      data: data,
+      error: null,
+      isSuccess: true,
+    );
   }
 
+  /// Create a failure result
   factory LocationResult.failure(LocationError error) {
-    return LocationResult._(error: error, isSuccess: false);
+    return LocationResult._(
+      data: null,
+      error: error,
+      isSuccess: false,
+    );
   }
 
   R fold<R>(
@@ -49,6 +79,9 @@ class LocationResult<T> {
   ) {
     return isSuccess ? onSuccess(data as T) : onFailure(error!);
   }
+
+  /// Check if result is successful
+  bool get isFailure => !isSuccess;
 }
 
 /// Location service
@@ -100,7 +133,7 @@ class LocationService {
   }
 
   /// Check location permission
-  Future<LocationResult<bool>> checkLocationPermission() async {
+  Future<LocationResult<bool>> hasPermission() async {
     try {
       // Mock: always return true
       await Future.delayed(const Duration(milliseconds: 100));
@@ -116,7 +149,7 @@ class LocationService {
   }
 
   /// Request location permission
-  Future<LocationResult<bool>> requestLocationPermission() async {
+  Future<LocationResult<bool>> requestPermission() async {
     try {
       // Mock: always return true
       await Future.delayed(const Duration(milliseconds: 200));
@@ -154,6 +187,22 @@ class LocationService {
       },
       (error) => LocationResult.failure(error),
     );
+  }
+
+  /// Reverse geocode coordinates to address
+  Future<LocationResult<String>> reverseGeocode(double latitude, double longitude) async {
+    try {
+      // Mock implementation
+      await Future.delayed(const Duration(milliseconds: 300));
+      return LocationResult.success('Beijing, Beijing, China');
+    } catch (e) {
+      return LocationResult.failure(
+        LocationError(
+          type: LocationErrorType.unknown,
+          message: 'Failed to reverse geocode: ${e.toString()}',
+        ),
+      );
+    }
   }
 
   /// Calculate distance between two locations

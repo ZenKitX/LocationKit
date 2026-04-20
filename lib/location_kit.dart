@@ -11,7 +11,8 @@
 /// final locationService = LocationService();
 /// final result = await locationService.getCurrentLocation();
 /// ```
-library location_kit;
+
+library;
 
 export 'src/services/location_service.dart';
 export 'src/models/location_model.dart';
