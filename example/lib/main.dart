@@ -127,7 +127,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                     label: const Text('Reverse Geocode Beijing'),
                   ),
                   const SizedBox(height: 16),
-                  if (_reverseGeocodeResult != null) _buildLocationResult(_reverseGeocodeResult!),
+                  if (_reverseGeocodeResult != null) _buildReverseGeocodeResult(_reverseGeocodeResult!),
                 ],
               ),
             ),
@@ -271,6 +271,66 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
     );
   }
 
+  Widget _buildReverseGeocodeResult(LocationResult<String> result) {
+    return result.fold(
+      (address) => Card(
+        color: Colors.green.shade50,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Address Found',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.green.shade700,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildDetailRow('Address', address),
+            ],
+          ),
+        ),
+      ),
+      (error) => Card(
+        color: Colors.red.shade50,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              const Icon(Icons.error, color: Colors.red),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Error: ${_getErrorTypeName(error.type)}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.red.shade700,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      error.message,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLocationResult(LocationResult<LocationData> result) {
     return result.fold(
       (location) => Card(
@@ -323,7 +383,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                     Text(
                       'Error: ${_getErrorTypeName(error.type)}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.red[700],
+                            color: Colors.red.shade700,
                           ),
                     ),
                     const SizedBox(height: 4),
