@@ -177,17 +177,17 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () async {
+                      final context = this.context;
                       final result = await _locationService.hasPermission();
-                      if (mounted) {
-                        final hasPermission = result.isSuccess && result.data == true;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              hasPermission ? 'Permission Granted' : 'Permission Denied',
-                            ),
+                      if (!mounted) return;
+                      final hasPermission = result.isSuccess && result.data == true;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            hasPermission ? 'Permission Granted' : 'Permission Denied',
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                     icon: const Icon(Icons.check_circle),
                     label: const Text('Check Permission'),
@@ -195,17 +195,17 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () async {
+                      final context = this.context;
                       final result = await _locationService.requestPermission();
-                      if (mounted) {
-                        final granted = result.isSuccess && result.data == true;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              granted ? 'Permission Granted' : 'Permission Denied',
-                            ),
+                      if (!mounted) return;
+                      final granted = result.isSuccess && result.data == true;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            granted ? 'Permission Granted' : 'Permission Denied',
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                     icon: const Icon(Icons.settings),
                     label: const Text('Request Permission'),
@@ -431,7 +431,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
 
   Widget _buildPermissionStatus() {
     return Card(
-      color: Colors.blue[50],
+      color: Colors.blue.shade50,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -444,7 +444,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                 'In production, you would integrate with actual GPS services '
                 'like the "location" or "geolocator" package.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.blue[700],
+                      color: Colors.blue.shade700,
                     ),
               ),
             ),
