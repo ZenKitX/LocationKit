@@ -51,7 +51,7 @@ void benchmarkLatLongCreation() {
   stopwatch.start();
 
   for (int i = 0; i < iterations; i++) {
-    const LatLong(latitude: 91.0, longitude: 0.0);
+    const LatLong(latitude: 100.0, longitude: 200.0);
   }
 
   stopwatch.stop();
@@ -108,8 +108,9 @@ void benchmarkLocationDataCreation() {
 
   for (int i = 0; i < iterations; i++) {
     LocationData(
-      name: 'Beijing',
-      coordinates: latLong,
+      city: 'Beijing',
+      latitude: 39.9042,
+      longitude: 116.4074,
       country: 'China',
     );
   }
@@ -126,11 +127,11 @@ void benchmarkLocationDataCreation() {
 
   for (int i = 0; i < iterations; i++) {
     LocationData(
-      name: 'Beijing',
-      coordinates: latLong,
+      city: 'Beijing',
+      latitude: 39.9042,
+      longitude: 116.4074,
       country: 'China',
       region: 'Beijing',
-      city: 'Beijing',
       address: 'Dongcheng District, Beijing, China',
     );
   }
@@ -148,8 +149,9 @@ void benchmarkResultCreation() {
 
   const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
   final location = LocationData(
-    name: 'Beijing',
-    coordinates: latLong,
+    city: 'Beijing',
+    latitude: 39.9042,
+    longitude: 116.4074,
     country: 'China',
   );
 
@@ -187,8 +189,10 @@ void benchmarkResultCreation() {
 void benchmarkErrorCreation() {
   print('--- Error Creation Benchmark ---');
 
-  final stopwatch = Stopwatch()..start();
   const iterations = 100000;
+
+  // Benchmark permission denied error
+  final stopwatch = Stopwatch()..start();
 
   for (int i = 0; i < iterations; i++) {
     LocationError.permissionDenied('Test error');
@@ -200,6 +204,7 @@ void benchmarkErrorCreation() {
     '  LocationError.permissionDenied: ${avgTime1.toStringAsFixed(2)} μs/op ($iterations ops)',
   );
 
+  // Benchmark service disabled error
   stopwatch.reset();
   stopwatch.start();
 
@@ -213,6 +218,7 @@ void benchmarkErrorCreation() {
     '  LocationError.serviceDisabled: ${avgTime2.toStringAsFixed(2)} μs/op ($iterations ops)',
   );
 
+  // Benchmark timeout error
   stopwatch.reset();
   stopwatch.start();
 
@@ -226,6 +232,7 @@ void benchmarkErrorCreation() {
     '  LocationError.timeout: ${avgTime3.toStringAsFixed(2)} μs/op ($iterations ops)',
   );
 
+  // Benchmark unknown error
   stopwatch.reset();
   stopwatch.start();
 
@@ -241,63 +248,11 @@ void benchmarkErrorCreation() {
   print('');
 }
 
-void benchmarkCoordinateValidation() {
-  print('--- Coordinate Validation Benchmark ---');
-
-  const iterations = 100000;
-
-  final validCoords = [
-    const LatLong(latitude: 0.0, longitude: 0.0),
-    const LatLong(latitude: 90.0, longitude: 180.0),
-    const LatLong(latitude: -90.0, longitude: -180.0),
-    const LatLong(latitude: 39.9042, longitude: 116.4074),
-  ];
-
-  final invalidCoords = [
-    const LatLong(latitude: 91.0, longitude: 0.0),
-    const LatLong(latitude: -91.0, longitude: 0.0),
-    const LatLong(latitude: 0.0, longitude: 181.0),
-    const LatLong(latitude: 0.0, longitude: -181.0),
-  ];
-
-  // Benchmark valid coordinates
-  final stopwatch = Stopwatch()..start();
-
-  for (int i = 0; i < iterations; i++) {
-    for (final coord in validCoords) {
-      coord.isValid;
-    }
-  }
-
-  stopwatch.stop();
-  final avgTime1 = stopwatch.elapsedMicroseconds / (iterations * validCoords.length);
-  print(
-    '  isValid (valid): ${avgTime1.toStringAsFixed(2)} μs/op (${iterations * validCoords.length} ops)',
-  );
-
-  // Benchmark invalid coordinates
-  stopwatch.reset();
-  stopwatch.start();
-
-  for (int i = 0; i < iterations; i++) {
-    for (final coord in invalidCoords) {
-      coord.isValid;
-    }
-  }
-
-  stopwatch.stop();
-  final avgTime2 = stopwatch.elapsedMicroseconds / (iterations * invalidCoords.length);
-  print(
-    '  isValid (invalid): ${avgTime2.toStringAsFixed(2)} μs/op (${iterations * invalidCoords.length} ops)',
-  );
-  print('');
-}
-
 // Extension method for testing
 extension LocationServiceBenchmark on LocationService {
   void _testDistance() {
-    const beijing = LatLong(latitude: 39.9042, longitude: 116.4074);
-    const shanghai = LatLong(latitude: 31.2304, longitude: 121.4737);
-    beijing.distanceTo(shanghai);
+    const p1 = LatLong(latitude: 39.9042, longitude: 116.4074);
+    const p2 = LatLong(latitude: 31.2304, longitude: 121.4737);
+    calculateDistance(p1.latitude, p1.longitude, p2.latitude, p2.longitude);
   }
 }

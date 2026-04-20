@@ -58,7 +58,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
       _reverseGeocodeResult = null;
     });
 
-    final result = await _locationService.reverseGeocode(coordinates);
+    final result = await _locationService.reverseGeocode(coordinates.latitude, coordinates.longitude);
 
     setState(() {
       _reverseGeocodeResult = result;
@@ -67,7 +67,12 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
   }
 
   Future<void> _calculateDistance() async {
-    final distance = await _locationService.calculateDistance(_beijing, _shanghai);
+    final distance = _locationService.calculateDistance(
+      _beijing.latitude,
+      _beijing.longitude,
+      _shanghai.latitude,
+      _shanghai.longitude,
+    );
     setState(() {
       _distance = distance;
     });
@@ -286,16 +291,17 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                 ],
               ),
               const SizedBox(height: 12),
-              _buildDetailRow('Name', location.name),
+              _buildDetailRow('Name', location.name ?? 'Unknown'),
               if (location.city != null) _buildDetailRow('City', location.city!),
               if (location.region != null) _buildDetailRow('Region', location.region!),
-              _buildDetailRow('Country', location.country),
+              _buildDetailRow('Country', location.country ?? 'Unknown'),
               if (location.address != null) _buildDetailRow('Address', location.address!),
               const SizedBox(height: 8),
-              _buildDetailRow(
-                'Coordinates',
-                '${location.coordinates.latitude.toStringAsFixed(4)}, ${location.coordinates.longitude.toStringAsFixed(4)}',
-              ),
+              if (location.coordinates != null)
+                _buildDetailRow(
+                  'Coordinates',
+                  '${location.coordinates!.latitude.toStringAsFixed(4)}, ${location.coordinates!.longitude.toStringAsFixed(4)}',
+                ),
             ],
           ),
         ),
@@ -390,6 +396,8 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
     switch (type) {
       case LocationErrorType.permissionDenied:
         return 'Permission Denied';
+      case LocationErrorType.permissionPermanentlyDenied:
+        return 'Permission Permanently Denied';
       case LocationErrorType.serviceDisabled:
         return 'Service Disabled';
       case LocationErrorType.timeout:

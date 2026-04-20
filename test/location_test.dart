@@ -50,39 +50,63 @@ void main() {
 
   group('LocationData', () {
     test('should create location data', () {
-      const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
       final location = LocationData(
-        name: 'Beijing',
-        coordinates: latLong,
+        city: 'Beijing',
+        latitude: 39.9042,
+        longitude: 116.4074,
         country: 'China',
       );
-      expect(location.name, 'Beijing');
-      expect(location.coordinates, latLong);
+      expect(location.city, 'Beijing');
+      expect(location.latitude, 39.9042);
+      expect(location.longitude, 116.4074);
       expect(location.country, 'China');
     });
 
     test('should create location data with optional fields', () {
-      const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
       final location = LocationData(
-        name: 'Beijing',
-        coordinates: latLong,
+        city: 'Beijing',
+        latitude: 39.9042,
+        longitude: 116.4074,
         country: 'China',
         region: 'Beijing',
-        city: 'Beijing',
         address: 'Dongcheng District',
       );
       expect(location.region, 'Beijing');
       expect(location.city, 'Beijing');
       expect(location.address, 'Dongcheng District');
     });
+
+    test('should return coordinates as LatLong', () {
+      final location = LocationData(
+        city: 'Beijing',
+        latitude: 39.9042,
+        longitude: 116.4074,
+        country: 'China',
+      );
+      final coords = location.coordinates;
+      expect(coords, isNotNull);
+      expect(coords!.latitude, 39.9042);
+      expect(coords.longitude, 116.4074);
+    });
+
+    test('should return name', () {
+      final location = LocationData(
+        city: 'Beijing',
+        latitude: 39.9042,
+        longitude: 116.4074,
+        country: 'China',
+      );
+      expect(location.name, 'Beijing');
+    });
   });
 
   group('LocationErrorType', () {
     test('should have correct error types', () {
       expect(LocationErrorType.permissionDenied.index, equals(0));
-      expect(LocationErrorType.serviceDisabled.index, equals(1));
-      expect(LocationErrorType.timeout.index, equals(2));
-      expect(LocationErrorType.unknown.index, equals(3));
+      expect(LocationErrorType.permissionPermanentlyDenied.index, equals(1));
+      expect(LocationErrorType.serviceDisabled.index, equals(2));
+      expect(LocationErrorType.timeout.index, equals(3));
+      expect(LocationErrorType.unknown.index, equals(4));
     });
   });
 
@@ -114,10 +138,10 @@ void main() {
 
   group('LocationResult', () {
     test('should create success result', () {
-      const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
       final location = LocationData(
-        name: 'Beijing',
-        coordinates: latLong,
+        city: 'Beijing',
+        latitude: 39.9042,
+        longitude: 116.4074,
         country: 'China',
       );
       final result = LocationResult.success(location);
@@ -135,10 +159,10 @@ void main() {
     });
 
     test('fold should execute success callback', () {
-      const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
       final location = LocationData(
-        name: 'Beijing',
-        coordinates: latLong,
+        city: 'Beijing',
+        latitude: 39.9042,
+        longitude: 116.4074,
         country: 'China',
       );
       final result = LocationResult.success(location);
@@ -175,8 +199,7 @@ void main() {
     });
 
     test('should return mock location for reverseGeocode', () async {
-      const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
-      final result = await service.reverseGeocode(latLong);
+      final result = await service.reverseGeocode(39.9042, 116.4074);
       expect(result, isNotNull);
       expect(result.isSuccess, isTrue);
       expect(result.data, isNotNull);
@@ -185,18 +208,25 @@ void main() {
     test('should return distance between two locations', () async {
       const beijing = LatLong(latitude: 39.9042, longitude: 116.4074);
       const shanghai = LatLong(latitude: 31.2304, longitude: 121.4737);
-      final distance = await service.calculateDistance(beijing, shanghai);
+      final distance = service.calculateDistance(
+        beijing.latitude,
+        beijing.longitude,
+        shanghai.latitude,
+        shanghai.longitude,
+      );
       expect(distance, greaterThan(1000));
     });
 
     test('should check permission status', () async {
-      final hasPermission = await service.hasPermission();
-      expect(hasPermission, isA<bool>());
+      final result = await service.hasPermission();
+      expect(result, isA<LocationResult<bool>>());
+      expect(result.isSuccess, isTrue);
     });
 
     test('should request permission', () async {
-      final granted = await service.requestPermission();
-      expect(granted, isA<bool>());
+      final result = await service.requestPermission();
+      expect(result, isA<LocationResult<bool>>());
+      expect(result.isSuccess, isTrue);
     });
   });
 }

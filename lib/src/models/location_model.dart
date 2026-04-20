@@ -2,7 +2,7 @@ import 'dart:math';
 
 /// Latitude and longitude pair
 class LatLong {
-  LatLong({
+  const LatLong({
     required this.latitude,
     required this.longitude,
   });
