@@ -304,7 +304,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              const Icon(Icons.error, color: Colors.red),
+              const Icon(Icons.error, color: Colors.redAccent),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
@@ -374,7 +374,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              const Icon(Icons.error, color: Colors.red),
+              const Icon(Icons.error, color: Colors.redAccent),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
