@@ -35,8 +35,14 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
   double? _distance;
   bool _isLoading = false;
 
-  final LatLong _beijing = const LatLong(latitude: 39.9042, longitude: 116.4074);
-  final LatLong _shanghai = const LatLong(latitude: 31.2304, longitude: 121.4737);
+  final LatLong _beijing = const LatLong(
+    latitude: 39.9042,
+    longitude: 116.4074,
+  );
+  final LatLong _shanghai = const LatLong(
+    latitude: 31.2304,
+    longitude: 121.4737,
+  );
 
   Future<void> _getCurrentLocation() async {
     setState(() {
@@ -58,7 +64,10 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
       _reverseGeocodeResult = null;
     });
 
-    final result = await _locationService.reverseGeocode(coordinates.latitude, coordinates.longitude);
+    final result = await _locationService.reverseGeocode(
+      coordinates.latitude,
+      coordinates.longitude,
+    );
 
     setState(() {
       _reverseGeocodeResult = result;
@@ -107,7 +116,8 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                     label: const Text('Get Current Location'),
                   ),
                   const SizedBox(height: 16),
-                  if (_currentLocation != null) _buildLocationResult(_currentLocation!),
+                  if (_currentLocation != null)
+                    _buildLocationResult(_currentLocation!),
                 ],
               ),
             ),
@@ -122,12 +132,15 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   _buildCoordinatesInput(_shanghai, 'Shanghai'),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
-                    onPressed: _isLoading ? null : () => _reverseGeocode(_beijing),
+                    onPressed: _isLoading
+                        ? null
+                        : () => _reverseGeocode(_beijing),
                     icon: const Icon(Icons.search),
                     label: const Text('Reverse Geocode Beijing'),
                   ),
                   const SizedBox(height: 16),
-                  if (_reverseGeocodeResult != null) _buildReverseGeocodeResult(_reverseGeocodeResult!),
+                  if (_reverseGeocodeResult != null)
+                    _buildReverseGeocodeResult(_reverseGeocodeResult!),
                 ],
               ),
             ),
@@ -181,11 +194,14 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                       final messenger = ScaffoldMessenger.of(context);
                       final result = await _locationService.hasPermission();
                       if (!mounted) return;
-                      final hasPermission = result.isSuccess && result.data == true;
+                      final hasPermission =
+                          result.isSuccess && result.data == true;
                       messenger.showSnackBar(
                         SnackBar(
                           content: Text(
-                            hasPermission ? 'Permission Granted' : 'Permission Denied',
+                            hasPermission
+                                ? 'Permission Granted'
+                                : 'Permission Denied',
                           ),
                         ),
                       );
@@ -204,7 +220,9 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                       messenger.showSnackBar(
                         SnackBar(
                           content: Text(
-                            granted ? 'Permission Granted' : 'Permission Denied',
+                            granted
+                                ? 'Permission Granted'
+                                : 'Permission Denied',
                           ),
                         ),
                       );
@@ -221,7 +239,11 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
     );
   }
 
-  Widget _buildSectionCard({required String title, required IconData icon, required Widget child}) {
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -233,10 +255,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
               children: [
                 Icon(icon, size: 24),
                 const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text(title, style: Theme.of(context).textTheme.titleLarge),
               ],
             ),
             const SizedBox(height: 16),
@@ -255,17 +274,14 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text(label, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(
               'Lat: ${coordinates.latitude.toStringAsFixed(4)}, '
               'Lon: ${coordinates.longitude.toStringAsFixed(4)}',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontFamily: 'monospace',
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontFamily: 'monospace'),
             ),
           ],
         ),
@@ -289,8 +305,8 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   Text(
                     'Address Found',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.green.shade700,
-                        ),
+                      color: Colors.green.shade700,
+                    ),
                   ),
                 ],
               ),
@@ -315,8 +331,8 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                     Text(
                       'Error: ${_getErrorTypeName(error.type)}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.red.shade700,
-                          ),
+                        color: Colors.red.shade700,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -349,17 +365,20 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                   Text(
                     'Location Found',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.green.shade700,
-                        ),
+                      color: Colors.green.shade700,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
               _buildDetailRow('Name', location.name),
-              if (location.city != null) _buildDetailRow('City', location.city!),
-              if (location.region != null) _buildDetailRow('Region', location.region!),
+              if (location.city != null)
+                _buildDetailRow('City', location.city!),
+              if (location.region != null)
+                _buildDetailRow('Region', location.region!),
               _buildDetailRow('Country', location.country ?? 'Unknown'),
-              if (location.address != null) _buildDetailRow('Address', location.address!),
+              if (location.address != null)
+                _buildDetailRow('Address', location.address!),
               const SizedBox(height: 8),
               if (location.coordinates != null)
                 _buildDetailRow(
@@ -385,8 +404,8 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                     Text(
                       'Error: ${_getErrorTypeName(error.type)}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.red.shade700,
-                          ),
+                        color: Colors.red.shade700,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -413,17 +432,17 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
             width: 100,
             child: Text(
               '$label:',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -445,9 +464,9 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
                 'Note: This is a mock implementation. '
                 'In production, you would integrate with actual GPS services '
                 'like the "location" or "geolocator" package.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.blue.shade700,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.blue.shade700),
               ),
             ),
           ],

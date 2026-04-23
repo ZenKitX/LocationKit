@@ -27,7 +27,11 @@ class LatLong {
   }
 
   /// Check if coordinates are valid
-  bool get isValid => latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+  bool get isValid =>
+      latitude >= -90 &&
+      latitude <= 90 &&
+      longitude >= -180 &&
+      longitude <= 180;
 
   /// Calculate distance between two points in kilometers
   double distanceTo(LatLong other) {
@@ -38,9 +42,9 @@ class LatLong {
 
     final a = sin(dLat / 2) * sin(dLat / 2) +
         cos(_degreesToRadians(latitude)) *
-        cos(_degreesToRadians(other.latitude)) *
-        sin(dLon / 2) *
-        sin(dLon / 2);
+            cos(_degreesToRadians(other.latitude)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
 
     final c = 2 * asin(sqrt(a));
 
@@ -76,9 +80,8 @@ class LocationData {
       region: json['region'],
       country: json['country'],
       address: json['address'],
-      timestamp: json['timestamp'] != null
-          ? DateTime.parse(json['timestamp'])
-          : null,
+      timestamp:
+          json['timestamp'] != null ? DateTime.parse(json['timestamp']) : null,
     );
   }
 

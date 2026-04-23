@@ -18,12 +18,14 @@ class LocationError {
 
   /// Create permission denied error
   factory LocationError.permissionDenied(String message) {
-    return LocationError(type: LocationErrorType.permissionDenied, message: message);
+    return LocationError(
+        type: LocationErrorType.permissionDenied, message: message);
   }
 
   /// Create service disabled error
   factory LocationError.serviceDisabled(String message) {
-    return LocationError(type: LocationErrorType.serviceDisabled, message: message);
+    return LocationError(
+        type: LocationErrorType.serviceDisabled, message: message);
   }
 
   /// Create timeout error
@@ -192,7 +194,8 @@ class LocationService {
   }
 
   /// Reverse geocode coordinates to address
-  Future<LocationResult<String>> reverseGeocode(double latitude, double longitude) async {
+  Future<LocationResult<String>> reverseGeocode(
+      double latitude, double longitude) async {
     try {
       // Mock implementation
       await Future.delayed(const Duration(milliseconds: 300));
