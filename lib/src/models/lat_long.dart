@@ -8,23 +8,6 @@ class LatLong {
   /// Longitude in degrees (between -180 and 180).
   final double longitude;
 
-  /// Creates a LatLong from a LocationData object.
-  factory LatLong.fromLocationData(LocationData location) {
-    return LatLong(location.latitude, location.longitude);
-  }
-
   @override
   String toString() => 'LatLong($latitude, $longitude)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is LatLong &&
-        other.latitude == latitude &&
-        other.longitude == longitude;
-  }
-
-  @override
-  int get hashCode => latitude.hashCode ^ longitude.hashCode;
 }
