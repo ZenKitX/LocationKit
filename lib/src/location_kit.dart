@@ -67,8 +67,10 @@ class LocationKit {
     final deltaLonRad = _degreesToRadians(end.longitude - start.longitude);
 
     final a = sin(deltaLatRad / 2) * sin(deltaLatRad / 2) +
-        cos(lat1Rad) * cos(lat2Rad) *
-        sin(deltaLonRad / 2) * sin(deltaLonRad / 2);
+        cos(lat1Rad) *
+            cos(lat2Rad) *
+            sin(deltaLonRad / 2) *
+            sin(deltaLonRad / 2);
 
     final c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
