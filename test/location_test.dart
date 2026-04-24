@@ -13,7 +13,7 @@ void main() {
         const MethodChannel('location_kit'),
         (MethodCall methodCall) async {
           if (methodCall.method == 'getCurrentLocation') {
-            return {
+            return <String, dynamic>{
               'latitude': 39.9042,
               'longitude': 116.4074,
               'accuracy': 10.0,
