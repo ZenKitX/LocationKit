@@ -12,9 +12,8 @@ void main() {
 
   // Warm up
   print('Warming up...');
-  final warmupService = LocationService();
   for (int i = 0; i < 100; i++) {
-    warmupService._testDistance();
+    _testDistance();
   }
   print('Warm up complete.\n');
 
@@ -22,8 +21,6 @@ void main() {
   benchmarkLatLongCreation();
   benchmarkDistanceCalculation();
   benchmarkLocationDataCreation();
-  benchmarkResultCreation();
-  benchmarkErrorCreation();
 
   print('\n=== Benchmark Complete ===');
 }
@@ -37,7 +34,7 @@ void benchmarkLatLongCreation() {
   final stopwatch = Stopwatch()..start();
 
   for (int i = 0; i < iterations; i++) {
-    const LatLong(latitude: 39.9042, longitude: 116.4074);
+    const LatLong(39.9042, 116.4074);
   }
 
   stopwatch.stop();
@@ -51,7 +48,7 @@ void benchmarkLatLongCreation() {
   stopwatch.start();
 
   for (int i = 0; i < iterations; i++) {
-    const LatLong(latitude: 100.0, longitude: 200.0);
+    const LatLong(100.0, 200.0);
   }
 
   stopwatch.stop();
@@ -65,10 +62,10 @@ void benchmarkLatLongCreation() {
 void benchmarkDistanceCalculation() {
   print('--- Distance Calculation Benchmark ---');
 
-  const beijing = LatLong(latitude: 39.9042, longitude: 116.4074);
-  const shanghai = LatLong(latitude: 31.2304, longitude: 121.4737);
-  const guangzhou = LatLong(latitude: 23.1291, longitude: 113.2644);
-  const shenzhen = LatLong(latitude: 22.5431, longitude: 114.0579);
+  const beijing = LatLong(39.9042, 116.4074);
+  const shanghai = LatLong(31.2304, 121.4737);
+  const guangzhou = LatLong(23.1291, 113.2644);
+  const shenzhen = LatLong(22.5431, 114.0579);
 
   final pairs = [
     (beijing, shanghai),
@@ -84,13 +81,14 @@ void benchmarkDistanceCalculation() {
     const iterations = 100000;
 
     for (int i = 0; i < iterations; i++) {
-      from.distanceTo(to);
+      LocationKit.calculateDistance(from, to);
     }
 
     stopwatch.stop();
     final avgTime = stopwatch.elapsedMicroseconds / iterations;
+    final distance = LocationKit.calculateDistance(from, to);
     print(
-      '  distanceTo (distance: ${from.distanceTo(to).toStringAsFixed(0)} km): '
+      '  calculateDistance (distance: ${(distance / 1000).toStringAsFixed(0)} km): '
       '${avgTime.toStringAsFixed(2)} μs/op ($iterations ops)',
     );
   }
@@ -107,10 +105,9 @@ void benchmarkLocationDataCreation() {
 
   for (int i = 0; i < iterations; i++) {
     LocationData(
-      city: 'Beijing',
       latitude: 39.9042,
       longitude: 116.4074,
-      country: 'China',
+      timestamp: DateTime.now(),
     );
   }
 
@@ -126,12 +123,10 @@ void benchmarkLocationDataCreation() {
 
   for (int i = 0; i < iterations; i++) {
     LocationData(
-      city: 'Beijing',
       latitude: 39.9042,
       longitude: 116.4074,
-      country: 'China',
-      region: 'Beijing',
-      address: 'Dongcheng District, Beijing, China',
+      accuracy: 10.5,
+      timestamp: DateTime.now(),
     );
   }
 
@@ -143,114 +138,9 @@ void benchmarkLocationDataCreation() {
   print('');
 }
 
-void benchmarkResultCreation() {
-  print('--- Result Creation Benchmark ---');
-
-  final location = LocationData(
-    city: 'Beijing',
-    latitude: 39.9042,
-    longitude: 116.4074,
-    country: 'China',
-  );
-
-  final stopwatch = Stopwatch()..start();
-  const iterations = 100000;
-
-  for (int i = 0; i < iterations; i++) {
-    final result = LocationResult.success(location);
-    result.fold((data) => data.name.length, (error) => 0);
-  }
-
-  stopwatch.stop();
-  final avgTime1 = stopwatch.elapsedMicroseconds / iterations;
-  print(
-    '  LocationResult.success: ${avgTime1.toStringAsFixed(2)} μs/op ($iterations ops)',
-  );
-
-  stopwatch.reset();
-  stopwatch.start();
-
-  for (int i = 0; i < iterations; i++) {
-    final error = LocationError.permissionDenied('Test error');
-    final result = LocationResult<LocationData>.failure(error);
-    result.fold((data) => 0, (error) => error.message.length);
-  }
-
-  stopwatch.stop();
-  final avgTime2 = stopwatch.elapsedMicroseconds / iterations;
-  print(
-    '  LocationResult.failure: ${avgTime2.toStringAsFixed(2)} μs/op ($iterations ops)',
-  );
-  print('');
-}
-
-void benchmarkErrorCreation() {
-  print('--- Error Creation Benchmark ---');
-
-  const iterations = 100000;
-
-  // Benchmark permission denied error
-  final stopwatch = Stopwatch()..start();
-
-  for (int i = 0; i < iterations; i++) {
-    LocationError.permissionDenied('Test error');
-  }
-
-  stopwatch.stop();
-  final avgTime1 = stopwatch.elapsedMicroseconds / iterations;
-  print(
-    '  LocationError.permissionDenied: ${avgTime1.toStringAsFixed(2)} μs/op ($iterations ops)',
-  );
-
-  // Benchmark service disabled error
-  stopwatch.reset();
-  stopwatch.start();
-
-  for (int i = 0; i < iterations; i++) {
-    LocationError.serviceDisabled('Test error');
-  }
-
-  stopwatch.stop();
-  final avgTime2 = stopwatch.elapsedMicroseconds / iterations;
-  print(
-    '  LocationError.serviceDisabled: ${avgTime2.toStringAsFixed(2)} μs/op ($iterations ops)',
-  );
-
-  // Benchmark timeout error
-  stopwatch.reset();
-  stopwatch.start();
-
-  for (int i = 0; i < iterations; i++) {
-    LocationError.timeout('Test error');
-  }
-
-  stopwatch.stop();
-  final avgTime3 = stopwatch.elapsedMicroseconds / iterations;
-  print(
-    '  LocationError.timeout: ${avgTime3.toStringAsFixed(2)} μs/op ($iterations ops)',
-  );
-
-  // Benchmark unknown error
-  stopwatch.reset();
-  stopwatch.start();
-
-  for (int i = 0; i < iterations; i++) {
-    LocationError.unknown('Test error');
-  }
-
-  stopwatch.stop();
-  final avgTime4 = stopwatch.elapsedMicroseconds / iterations;
-  print(
-    '  LocationError.unknown: ${avgTime4.toStringAsFixed(2)} μs/op ($iterations ops)',
-  );
-  print('');
-}
-
-// Extension method for testing
-extension LocationServiceBenchmark on LocationService {
-  void _testDistance() {
-    const p1 = LatLong(latitude: 39.9042, longitude: 116.4074);
-    const p2 = LatLong(latitude: 31.2304, longitude: 121.4737);
-    calculateDistance(p1.latitude, p1.longitude, p2.latitude, p2.longitude);
-  }
+// Helper function for testing
+void _testDistance() {
+  const p1 = LatLong(39.9042, 116.4074);
+  const p2 = LatLong(31.2304, 121.4737);
+  LocationKit.calculateDistance(p1, p2);
 }

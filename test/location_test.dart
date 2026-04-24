@@ -40,6 +40,7 @@ void main() {
       expect(location.latitude, 39.9042);
       expect(location.longitude, 116.4074);
       expect(location.accuracy, 10.0);
+      expect(location.timestamp, isNotNull);
     });
 
     test('calculateDistance should calculate distance correctly', () {
