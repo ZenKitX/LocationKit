@@ -2,114 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:location_kit/location_kit.dart';
 
 void main() {
-  group('LatLong', () {
-    test('should create latitude and longitude', () {
-      const latLong = LatLong(latitude: 39.9042, longitude: 116.4074);
-      expect(latLong.latitude, 39.9042);
-      expect(latLong.longitude, 116.4074);
-    });
-
-    test('should validate valid latitude', () {
-      const latLong = LatLong(latitude: 0.0, longitude: 0.0);
-      expect(latLong.isValid, isTrue);
-    });
-
-    test('should validate invalid latitude', () {
-      const latLong1 = LatLong(latitude: 91.0, longitude: 0.0);
-      const latLong2 = LatLong(latitude: -91.0, longitude: 0.0);
-      expect(latLong1.isValid, isFalse);
-      expect(latLong2.isValid, isFalse);
-    });
-
-    test('should validate valid longitude', () {
-      const latLong = LatLong(latitude: 0.0, longitude: 180.0);
-      expect(latLong.isValid, isTrue);
-    });
-
-    test('should validate invalid longitude', () {
-      const latLong1 = LatLong(latitude: 0.0, longitude: 181.0);
-      const latLong2 = LatLong(latitude: 0.0, longitude: -181.0);
-      expect(latLong1.isValid, isFalse);
-      expect(latLong2.isValid, isFalse);
-    });
-
-    test('should calculate distance between two points', () {
-      const beijing = LatLong(latitude: 39.9042, longitude: 116.4074);
-      const shanghai = LatLong(latitude: 31.2304, longitude: 121.4737);
-      final distance = beijing.distanceTo(shanghai);
-      expect(distance, greaterThan(1000)); // ~1068 km
-      expect(distance, lessThan(1200));
-    });
-
-    test('should calculate zero distance for same point', () {
-      const point = LatLong(latitude: 39.9042, longitude: 116.4074);
-      final distance = point.distanceTo(point);
-      expect(distance, closeTo(0, 0.001));
-    });
-  });
-
-  group('LocationData', () {
-    test('should create location data', () {
-      final location = LocationData(
-        city: 'Beijing',
-        latitude: 39.9042,
-        longitude: 116.4074,
-        country: 'China',
-      );
-      expect(location.city, 'Beijing');
-      expect(location.latitude, 39.9042);
-      expect(location.longitude, 116.4074);
-      expect(location.country, 'China');
-    });
-
-    test('should create location data with optional fields', () {
-      final location = LocationData(
-        city: 'Beijing',
-        latitude: 39.9042,
-        longitude: 116.4074,
-        country: 'China',
-        region: 'Beijing',
-        address: 'Dongcheng District',
-      );
-      expect(location.region, 'Beijing');
-      expect(location.city, 'Beijing');
-      expect(location.address, 'Dongcheng District');
-    });
-
-    test('should return coordinates as LatLong', () {
-      final location = LocationData(
-        city: 'Beijing',
-        latitude: 39.9042,
-        longitude: 116.4074,
-        country: 'China',
-      );
-      final coords = location.coordinates;
-      expect(coords, isNotNull);
-      expect(coords!.latitude, 39.9042);
-      expect(coords.longitude, 116.4074);
-    });
-
-    test('should return name', () {
-      final location = LocationData(
-        city: 'Beijing',
-        latitude: 39.9042,
-        longitude: 116.4074,
-        country: 'China',
-      );
-      expect(location.name, 'Beijing');
-    });
-  });
-
-  group('LocationErrorType', () {
-    test('should have correct error types', () {
-      expect(LocationErrorType.permissionDenied.index, equals(0));
-      expect(LocationErrorType.permissionPermanentlyDenied.index, equals(1));
-      expect(LocationErrorType.serviceDisabled.index, equals(2));
-      expect(LocationErrorType.timeout.index, equals(3));
-      expect(LocationErrorType.unknown.index, equals(4));
-    });
-  });
-
   group('LocationError', () {
     test('should create permission denied error', () {
       final error = LocationError.permissionDenied('Permission denied');
@@ -118,15 +10,15 @@ void main() {
     });
 
     test('should create service disabled error', () {
-      final error = LocationError.serviceDisabled('GPS disabled');
+      final error = LocationError.serviceDisabled('Service disabled');
       expect(error.type, LocationErrorType.serviceDisabled);
-      expect(error.message, 'GPS disabled');
+      expect(error.message, 'Service disabled');
     });
 
     test('should create timeout error', () {
-      final error = LocationError.timeout('Request timeout');
+      final error = LocationError.timeout('Timeout');
       expect(error.type, LocationErrorType.timeout);
-      expect(error.message, 'Request timeout');
+      expect(error.message, 'Timeout');
     });
 
     test('should create unknown error', () {
@@ -136,97 +28,149 @@ void main() {
     });
   });
 
-  group('LocationResult', () {
+  group('Result', () {
     test('should create success result', () {
-      final location = LocationData(
-        city: 'Beijing',
-        latitude: 39.9042,
-        longitude: 116.4074,
-        country: 'China',
-      );
-      final result = LocationResult.success(location);
+      final result = Result.success(42);
       expect(result.isSuccess, isTrue);
       expect(result.isFailure, isFalse);
-      expect(result.data, equals(location));
+      expect(result.data, equals(42));
     });
 
     test('should create failure result', () {
       final error = LocationError.permissionDenied('Denied');
-      final result = LocationResult<LocationData>.failure(error);
+      final result = Result<int>.failure(error);
       expect(result.isSuccess, isFalse);
       expect(result.isFailure, isTrue);
       expect(result.error, equals(error));
     });
 
     test('fold should execute success callback', () {
-      final location = LocationData(
-        city: 'Beijing',
-        latitude: 39.9042,
-        longitude: 116.4074,
-        country: 'China',
-      );
-      final result = LocationResult.success(location);
+      final result = Result.success(10);
       final value = result.fold(
-        (data) => data.name.length,
+        (data) => data * 2,
         (error) => 0,
       );
-      expect(value, equals(7)); // "Beijing".length
+      expect(value, equals(20));
     });
 
     test('fold should execute failure callback', () {
-      final error = LocationError.permissionDenied('Denied');
-      final result = LocationResult<LocationData>.failure(error);
+      final error = LocationError.permissionDenied('Failed');
+      final result = Result<int>.failure(error);
       final value = result.fold(
-        (data) => 0,
+        (data) => data * 2,
         (error) => error.message.length,
       );
-      expect(value, equals(6)); // "Denied".length
+      expect(value, equals(6));
+    });
+
+    test('map should transform success data', () {
+      final result = Result.success(10).map((data) => data.toString());
+      expect(result.isSuccess, isTrue);
+      expect(result.data, equals('10'));
+    });
+
+    test('map should preserve failure', () {
+      final error = LocationError.permissionDenied('Failed');
+      final result = Result<int>.failure(error).map((data) => data.toString());
+      expect(result.isSuccess, isFalse);
+      expect(result.error, equals(error));
     });
   });
 
-  group('LocationService', () {
-    late LocationService service;
-
-    setUp(() {
-      service = LocationService();
+  group('LatLong', () {
+    test('should create LatLong', () {
+      const latLong = LatLong(39.9042, 116.4074);
+      expect(latLong.latitude, 39.9042);
+      expect(latLong.longitude, 116.4074);
     });
 
-    test('should return mock location for getCurrentLocation', () async {
-      final result = await service.getCurrentLocation();
-      expect(result, isNotNull);
-      expect(result.isSuccess, isTrue);
-      expect(result.data, isNotNull);
-    });
-
-    test('should return mock location for reverseGeocode', () async {
-      final result = await service.reverseGeocode(39.9042, 116.4074);
-      expect(result, isNotNull);
-      expect(result.isSuccess, isTrue);
-      expect(result.data, isNotNull);
-    });
-
-    test('should return distance between two locations', () async {
-      const beijing = LatLong(latitude: 39.9042, longitude: 116.4074);
-      const shanghai = LatLong(latitude: 31.2304, longitude: 121.4737);
-      final distance = service.calculateDistance(
-        beijing.latitude,
-        beijing.longitude,
-        shanghai.latitude,
-        shanghai.longitude,
+    test('should create LatLong from LocationData', () {
+      const location = LocationData(
+        latitude: 39.9042,
+        longitude: 116.4074,
+        timestamp: null,
       );
-      expect(distance, greaterThan(1000));
+      final latLong = LatLong.fromLocationData(location);
+      expect(latLong.latitude, 39.9042);
+      expect(latLong.longitude, 116.4074);
+    });
+  });
+
+  group('LocationData', () {
+    test('should create location data', () {
+      const location = LocationData(
+        latitude: 39.9042,
+        longitude: 116.4074,
+        timestamp: null,
+        altitude: 50.0,
+        accuracy: 10.0,
+      );
+      expect(location.latitude, 39.9042);
+      expect(location.longitude, 116.4074);
+      expect(location.altitude, 50.0);
+      expect(location.accuracy, 10.0);
     });
 
-    test('should check permission status', () async {
-      final result = await service.hasPermission();
-      expect(result, isA<LocationResult<bool>>());
-      expect(result.isSuccess, isTrue);
+    test('should convert to LatLong', () {
+      const location = LocationData(
+        latitude: 39.9042,
+        longitude: 116.4074,
+        timestamp: null,
+      );
+      final latLong = location.toLatLong();
+      expect(latLong.latitude, 39.9042);
+      expect(latLong.longitude, 116.4074);
     });
 
-    test('should request permission', () async {
-      final result = await service.requestPermission();
-      expect(result, isA<LocationResult<bool>>());
-      expect(result.isSuccess, isTrue);
+    test('should compare equality', () {
+      const location1 = LocationData(
+        latitude: 39.9042,
+        longitude: 116.4074,
+        timestamp: null,
+      );
+      const location2 = LocationData(
+        latitude: 39.9042,
+        longitude: 116.4074,
+        timestamp: null,
+      );
+      expect(location1, equals(location2));
+    });
+  });
+
+  group('LocationPermission', () {
+    test('should check isGranted', () {
+      expect(LocationPermission.whileInUse.isGranted, isTrue);
+      expect(LocationPermission.always.isGranted, isTrue);
+      expect(LocationPermission.denied.isGranted, isFalse);
+    });
+
+    test('should check isDenied', () {
+      expect(LocationPermission.denied.isDenied, isTrue);
+      expect(LocationPermission.deniedForever.isDenied, isTrue);
+      expect(LocationPermission.whileInUse.isDenied, isFalse);
+    });
+
+    test('should check isPermanentlyDenied', () {
+      expect(LocationPermission.deniedForever.isPermanentlyDenied, isTrue);
+      expect(LocationPermission.denied.isPermanentlyDenied, isFalse);
+    });
+  });
+
+  group('LocationKit - Static Methods', () {
+    test('calculateDistance should return distance in meters', () {
+      const start = LatLong(39.9042, 116.4074); // Beijing
+      const end = LatLong(31.2304, 121.4737); // Shanghai
+      final distance = LocationKit.calculateDistance(start, end);
+      expect(distance, greaterThan(1000000)); // > 1000km
+      expect(distance, lessThan(1500000)); // < 1500km
+    });
+
+    test('calculateBearing should return bearing in degrees', () {
+      const start = LatLong(39.9042, 116.4074); // Beijing
+      const end = LatLong(31.2304, 121.4737); // Shanghai
+      final bearing = LocationKit.calculateBearing(start, end);
+      expect(bearing, greaterThan(0));
+      expect(bearing, lessThan(360));
     });
   });
 }

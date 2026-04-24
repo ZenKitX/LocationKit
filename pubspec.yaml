@@ -1,9 +1,10 @@
 name: location_kit
-description: A location service package for Flutter apps. Provides GPS positioning and location management.
-version: 0.1.0
+description: A location service package for Flutter apps with GPS positioning, permission handling, and distance calculation.
+version: 0.2.0
 homepage: https://github.com/ZenKitX/LocationKit
 repository: https://github.com/ZenKitX/LocationKit
 issue_tracker: https://github.com/ZenKitX/LocationKit/issues
+documentation: https://github.com/ZenKitX/LocationKit/blob/main/README.md
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -12,8 +13,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  geolocator: ^11.0.0
+  permission_handler: ^11.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

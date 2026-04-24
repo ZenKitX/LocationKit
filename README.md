@@ -1,47 +1,42 @@
 # LocationKit
 
-A location service package for Flutter apps. Provides GPS positioning and location management.
+A powerful location service package for Flutter applications, built on top of the reliable [Geolocator](https://github.com/Baseflow/flutter-geolocator) library.
 
 ## Features
 
-- ✅ GPS positioning (mock implementation)
-- ✅ Location management
-- ✅ Permission handling
-- ✅ Error handling with Result type
-- ✅ Distance calculation
-- ✅ Minimal dependencies
+- ✅ **GPS Positioning** - Get current location with high accuracy
+- ✅ **Permission Handling** - Easy permission request and checking
+- ✅ **Location Streaming** - Real-time location updates
+- ✅ **Distance Calculation** - Calculate distances between coordinates
+- ✅ **Bearing Calculation** - Calculate heading between points
+- ✅ **Settings Integration** - Direct links to app/location settings
+- ✅ **Result Type** - Safe error handling with Result type
+- ✅ **Cross-Platform** - Android, iOS, Web, macOS, Linux, Windows
 
 ## Installation
 
-Add this to your package's `pubspec.yaml` file:
+Add `location_kit` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  location_kit:
-    git:
-      url: https://github.com/ZenKitX/LocationKit.git
-      ref: main
+  location_kit: ^0.2.0
 ```
 
 ## Usage
 
-### Basic Usage
+### Get Current Location
 
 ```dart
 import 'package:location_kit/location_kit.dart';
 
 void main() async {
-  final locationService = LocationService();
-
-  // Get current location
-  final result = await locationService.getCurrentLocation();
+  final result = await LocationKit.getCurrentLocation();
 
   result.fold(
     (location) {
       print('Latitude: ${location.latitude}');
       print('Longitude: ${location.longitude}');
-      print('City: ${location.city}');
-      print('Address: ${location.formattedString}');
+      print('Accuracy: ${location.accuracy}m');
     },
     (error) {
       print('Error: ${error.message}');
@@ -50,72 +45,88 @@ void main() async {
 }
 ```
 
-### Get Coordinates
+### Request Permission
 
 ```dart
-final result = await locationService.getLatLong();
+final result = await LocationKit.checkPermission();
 
 result.fold(
-  (latLong) {
-    print('Latitude: ${latLong.latitude}');
-    print('Longitude: ${latLong.longitude}');
+  (permission) {
+    if (!permission.isGranted) {
+      final requestResult = await LocationKit.requestPermission();
+      requestResult.fold(
+        (newPermission) => print('Permission: $newPermission'),
+        (error) => print('Error: ${error.message}'),
+      );
+    }
   },
   (error) => print('Error: ${error.message}'),
 );
 ```
 
-### Permission Handling
+### Stream Location Updates
 
 ```dart
-// Check permission
-final permissionCheck = await locationService.checkLocationPermission();
+final stream = LocationKit.getLocationStream();
 
-permissionCheck.fold(
-  (hasPermission) {
-    if (hasPermission) {
-      print('Location permission granted');
-    } else {
-      print('Location permission denied');
-    }
+stream.listen(
+  (result) {
+    result.fold(
+      (location) => print('Updated: ${location.latitude}, ${location.longitude}'),
+      (error) => print('Error: ${error.message}'),
+    );
   },
-  (error) => print('Error: ${error.message}'),
 );
-
-// Request permission
-final permissionResult = await locationService.requestLocationPermission();
 ```
 
 ### Calculate Distance
 
 ```dart
-final distance = locationService.calculateDistance(
-  39.9042, // Beijing lat
-  116.4074, // Beijing lon
-  31.2304, // Shanghai lat
-  121.4737, // Shanghai lon
-);
+const beijing = LatLong(39.9042, 116.4074);
+const shanghai = LatLong(31.2304, 121.4737);
 
-print('Distance: ${distance.toStringAsFixed(2)} km');
-// Output: Distance: 1067.54 km
+final distance = LocationKit.calculateDistance(beijing, shanghai);
+print('Distance: ${distance.toStringAsFixed(2)} meters');
 ```
 
-### Save and Load Location
+### Open Settings
 
 ```dart
-// Save location
-final location = LocationData(
-  latitude: 39.9042,
-  longitude: 116.4074,
-  city: 'Beijing',
-  region: 'Beijing',
-  country: 'China',
-);
-await locationService.saveLocation(location);
+// Open app settings to change permissions
+await LocationKit.openAppSettings();
 
-// Load last saved location
-final lastLocation = await locationService.getLastLocation();
-if (lastLocation != null) {
-  print('Last location: ${lastLocation.city}');
+// Open device location settings
+await LocationKit.openLocationSettings();
+```
+
+## Error Handling
+
+LocationKit uses a `Result<T>` type for safe error handling:
+
+```dart
+final result = await LocationKit.getCurrentLocation();
+
+if (result.isSuccess) {
+  final location = result.data;
+  // Use location
+} else {
+  final error = result.error;
+  // Handle error
+  switch (error.type) {
+    case LocationErrorType.permissionDenied:
+      // Request permission
+      break;
+    case LocationErrorType.serviceDisabled:
+      // Ask user to enable location service
+      break;
+    case LocationErrorType.permissionPermanentlyDenied:
+      // Guide user to app settings
+      await LocationKit.openAppSettings();
+      break;
+    default:
+      // Handle other errors
+      break;
+  }
 }
 ```
 
@@ -123,33 +134,38 @@ if (lastLocation != null) {
 
 ### LocationData
 
+Represents location data with all available information:
+
 ```dart
 class LocationData {
-  final double? latitude;
-  final double? longitude;
-  final String? city;
-  final String? region;
-  final String? country;
-  final String? address;
-  final DateTime? timestamp;
-
-  bool get hasCoordinates;
-  String get formattedString;
+  final double latitude;
+  final double longitude;
+  final DateTime timestamp;
+  final double altitude;
+  final double accuracy;
+  final double speed;
+  final double heading;
+  // ... more fields
 }
 ```
 
-### LatLong
+### LocationPermission
+
+Represents the permission status:
 
 ```dart
-class LatLong {
-  final double latitude;
-  final double longitude;
-
-  double distanceTo(LatLong other);
+enum LocationPermission {
+  denied,
+  deniedForever,
+  whileInUse,
+  always,
+  unknown,
 }
 ```
 
 ### LocationError
+
+Represents location-related errors:
 
 ```dart
 enum LocationErrorType {
@@ -161,110 +177,57 @@ enum LocationErrorType {
 }
 ```
 
-## Error Handling
+## API Reference
 
-All operations return a `LocationResult<T>` type:
+### Static Methods
 
-```dart
-final result = await locationService.getCurrentLocation();
+| Method | Description | Returns |
+|--------|-------------|---------|
+| `getCurrentLocation()` | Get current location | `Result<LocationData>` |
+| `getLastKnownPosition()` | Get last known position | `Result<LocationData?>` |
+| `isLocationServiceEnabled()` | Check if service is enabled | `Result<bool>` |
+| `checkPermission()` | Check permission status | `Result<LocationPermission>` |
+| `requestPermission()` | Request permission | `Result<LocationPermission>` |
+| `getLocationStream()` | Stream location updates | `Stream<Result<LocationData>>` |
+| `calculateDistance()` | Calculate distance | `double` |
+| `calculateBearing()` | Calculate bearing | `double` |
+| `openAppSettings()` | Open app settings | `Result<void>` |
+| `openLocationSettings()` | Open location settings | `Result<void>` |
 
-if (result.isSuccess) {
-  final location = result.data!;
-  // Use location
-} else {
-  final error = result.error!;
-  // Handle error
-}
+## Platform-Specific Configuration
+
+### Android
+
+Add to `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+<uses-feature android:name="android.hardware.location.gps" />
 ```
 
-Or use `fold`:
+### iOS
 
-```dart
-result.fold(
-  (location) {
-    // Success
-  },
-  (error) {
-    // Failure
-  },
-);
+Add to `ios/Runner/Info.plist`:
+
+```xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to location when in use.</string>
+
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>This app needs access to location always.</string>
 ```
 
-## Note
+## Dependencies
 
-This package provides a **mock implementation** for demonstration purposes.
-
-In a production app, you should:
-1. Add the `location` package to `pubspec.yaml`:
-   ```yaml
-   dependencies:
-     location: ^5.0.3
-   ```
-2. Implement actual GPS positioning
-3. Handle real permission requests
-4. Use platform-specific location services
-
-## Example Integration
-
-```dart
-import 'package:location/location.dart';
-
-class RealLocationService {
-  final Location _location = Location();
-
-  Future<LocationResult<LocationData>> getCurrentLocation() async {
-    try {
-      final serviceEnabled = await _location.serviceEnabled();
-      if (!serviceEnabled) {
-        return LocationResult.failure(
-          LocationError(
-            type: LocationErrorType.serviceDisabled,
-            message: 'Location services are disabled',
-          ),
-        );
-      }
-
-      final permission = await _location.hasPermission();
-      if (permission == PermissionStatus.denied) {
-        final requestResult = await _location.requestPermission();
-        if (requestResult != PermissionStatus.granted) {
-          return LocationResult.failure(
-            LocationError(
-              type: LocationErrorType.permissionDenied,
-              message: 'Location permission denied',
-            ),
-          );
-        }
-      }
-
-      final locationData = await _location.getLocation();
-      return LocationResult.success(
-        LocationData(
-          latitude: locationData.latitude,
-          longitude: locationData.longitude,
-          timestamp: DateTime.now(),
-        ),
-      );
-    } catch (e) {
-      return LocationResult.failure(
-        LocationError(
-          type: LocationErrorType.unknown,
-          message: e.toString(),
-        ),
-      );
-    }
-  }
-}
-```
+- [Geolocator](https://pub.dev/packages/geolocator) ^11.0.0
+- [Permission Handler](https://pub.dev/packages/permission_handler) ^11.0.0
 
 ## License
 
 MIT License
 
-## Contributing
+## Credits
 
-Contributions are welcome! Please feel free to:
-- Implement real GPS positioning
-- Add more features
-- Fix bugs
-- Improve documentation
+Built on top of [Geolocator](https://github.com/Baseflow/flutter-geolocator) by Baseflow.

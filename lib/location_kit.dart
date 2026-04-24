@@ -1,18 +1,6 @@
-/// LocationKit - A location service package for Flutter apps
-///
-/// This package provides:
-/// - GPS positioning
-/// - Location management
-/// - Permission handling
-/// - Error handling
-///
-/// Usage:
-/// ```dart
-/// final locationService = LocationService();
-/// final result = await locationService.getCurrentLocation();
-/// ```
-
-library;
-
-export 'src/services/location_service.dart';
-export 'src/models/location_model.dart';
+export 'src/location_kit.dart';
+export 'src/models/location_data.dart';
+export 'src/models/location_permission.dart';
+export 'src/models/lat_long.dart';
+export 'src/models/result.dart';
+export 'src/errors/location_errors.dart';
