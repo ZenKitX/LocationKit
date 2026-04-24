@@ -99,10 +99,10 @@ void main() {
     });
 
     test('LocationData should convert to LatLong', () {
-      final location = const LocationData(
+      final location = LocationData(
         latitude: 39.9042,
         longitude: 116.4074,
-        timestamp: null,
+        timestamp: DateTime.now(),
       );
       final latLong = location.toLatLong();
       expect(latLong.latitude, 39.9042);
