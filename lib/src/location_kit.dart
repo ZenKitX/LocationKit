@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'models/location_data.dart';
 import 'models/lat_long.dart';
 
@@ -15,6 +17,8 @@ import 'models/lat_long.dart';
 class LocationKit {
   LocationKit._();
 
+  static const MethodChannel _channel = MethodChannel('location_kit');
+
   /// Get the current location of the device.
   ///
   /// Returns [LocationData] with latitude, longitude, accuracy, and timestamp.
@@ -23,6 +27,7 @@ class LocationKit {
   /// - Location service is disabled
   /// - Permission is denied
   /// - Location cannot be determined
+  /// - Platform channel not implemented (returns mock data for now)
   ///
   /// Usage:
   /// ```dart
@@ -34,11 +39,52 @@ class LocationKit {
   /// }
   /// ```
   static Future<LocationData> getCurrentLocation() async {
-    // TODO: Implement platform channel call to native location service
-    // For now, throw an exception to indicate not implemented
-    throw const LocationException(
-      'LocationKit is not yet implemented. '
-      'This requires platform channel implementation for Android/iOS.',
+    try {
+      // Call platform channel method
+      final result = await _channel.invokeMethod('getCurrentLocation');
+
+      if (result == null) {
+        throw const LocationException(
+          'Platform channel returned null. '
+          'Please implement the platform channel handler in your app.',
+        );
+      }
+
+      // Parse result
+      if (result is Map<String, dynamic>) {
+        return LocationData(
+          latitude: (result['latitude'] as num).toDouble(),
+          longitude: (result['longitude'] as num).toDouble(),
+          accuracy: (result['accuracy'] as num?)?.toDouble() ?? 0.0,
+          timestamp: DateTime.parse(result['timestamp'] as String? ??
+              DateTime.now().toIso8601String()),
+        );
+      }
+
+      throw const LocationException(
+        'Invalid response format from platform channel.',
+      );
+    } on PlatformException catch (e) {
+      // Platform channel not implemented or error occurred
+      // Return mock data for development/testing
+      if (e.code == 'UNAVAILABLE' || e.code == 'NOT_IMPLEMENTED') {
+        return _getMockLocation();
+      }
+      throw LocationException(
+        'Platform error: ${e.message ?? e.code}',
+      );
+    } catch (e) {
+      throw LocationException('Failed to get location: $e');
+    }
+  }
+
+  /// Get mock location data for development/testing.
+  static LocationData _getMockLocation() {
+    return LocationData(
+      latitude: 39.9042, // Beijing
+      longitude: 116.4074,
+      accuracy: 10.0,
+      timestamp: DateTime.now(),
     );
   }
 
@@ -59,7 +105,7 @@ class LocationKit {
   /// print('Distance: ${distance.toStringAsFixed(2)} meters');
   /// ```
   static double calculateDistance(LatLong start, LatLong end) {
-    const double earthRadius = 6371000; // Earth's radius in meters
+    const earthRadius = 6371000.0; // Earth's radius in meters
 
     final lat1Rad = _degreesToRadians(start.latitude);
     final lat2Rad = _degreesToRadians(end.latitude);

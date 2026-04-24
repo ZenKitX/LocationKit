@@ -21,3 +21,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Plugin configuration
+  plugin:
+    platforms:
+      android:
+        package: com.zenkit.location_kit
+        pluginClass: LocationKitPlugin
+      ios:
+        pluginClass: SwiftLocationKitPlugin
