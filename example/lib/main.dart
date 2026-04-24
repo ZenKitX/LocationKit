@@ -97,10 +97,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
           children: [
             const Text(
               'Get Current Location',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             if (_isLoading)
@@ -139,18 +136,11 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
           children: [
             const Text(
               'Calculate Distance',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Beijing: ${_beijing.latitude}, ${_beijing.longitude}',
-            ),
-            Text(
-              'Shanghai: ${_shanghai.latitude}, ${_shanghai.longitude}',
-            ),
+            Text('Beijing: ${_beijing.latitude}, ${_beijing.longitude}'),
+            Text('Shanghai: ${_shanghai.latitude}, ${_shanghai.longitude}'),
             if (_distance != null) ...[
               const SizedBox(height: 8),
               Text(
@@ -182,10 +172,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
           children: [
             const Text(
               'Test Coordinates',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             _buildCoordinateRow('Beijing', _beijing),
@@ -237,21 +224,18 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
               SizedBox(width: 8),
               Text(
                 'Location Found',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 8),
           _buildInfoRow('Latitude', '${location.latitude.toStringAsFixed(6)}°'),
-          _buildInfoRow('Longitude', '${location.longitude.toStringAsFixed(6)}°'),
-          _buildInfoRow('Accuracy', '${location.accuracy.toStringAsFixed(1)}m'),
           _buildInfoRow(
-            'Timestamp',
-            '${location.timestamp.toLocal()}',
+            'Longitude',
+            '${location.longitude.toStringAsFixed(6)}°',
           ),
+          _buildInfoRow('Accuracy', '${location.accuracy.toStringAsFixed(1)}m'),
+          _buildInfoRow('Timestamp', '${location.timestamp.toLocal()}'),
         ],
       ),
     );
@@ -270,10 +254,7 @@ class _LocationExamplePageState extends State<LocationExamplePage> {
           const Icon(Icons.error, color: Colors.red),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.red),
-            ),
+            child: Text(message, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
