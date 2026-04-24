@@ -1,3 +1,5 @@
+import 'lat_long.dart';
+
 /// Represents basic location data.
 class LocationData {
   const LocationData({
