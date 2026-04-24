@@ -79,7 +79,8 @@ void main() {
       );
     });
 
-    test('getCurrentLocation should return mock data when channel not implemented',
+    test(
+        'getCurrentLocation should return mock data when channel not implemented',
         () async {
       final location = await LocationKit.getCurrentLocation();
 
